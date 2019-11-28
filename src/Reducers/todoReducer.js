@@ -11,7 +11,7 @@ const initialState = {
 	filterText: ""
 };
 
-let todos = JSON.parse(localStorage.getItem("todos")) || [];
+let todoList;
 
 export default (state = initialState, action) => {
 	switch (action.type) {
@@ -22,16 +22,15 @@ export default (state = initialState, action) => {
 			};
 
 		case ADD_TODO:
-			todos.unshift(action.payload);
-			localStorage.setItem("todos", JSON.stringify(todos));
-
+			todoList = [action.payload, ...state.todoList];
+			localStorage.setItem("todos", JSON.stringify(todoList));
 			return {
 				...state,
-				todoList: [action.payload, ...state.todoList]
+				todoList
 			};
 
 		case TOGGLE_COMPLETE:
-			const todoList = state.todoList.map(todo => {
+			todoList = state.todoList.map(todo => {
 				if (todo.id === action.payload) todo.completed = !todo.completed;
 				return todo;
 			});
@@ -42,16 +41,11 @@ export default (state = initialState, action) => {
 			};
 
 		case DELETE_TODO:
-			const newTodoList = state.todoList.filter(
-				item => item.id !== action.payload
-			);
-
-			todos = todos.filter(item => item.id !== action.payload);
-			localStorage.setItem("todos", JSON.stringify(todos));
-
+			todoList = state.todoList.filter(todo => todo.id !== action.payload);
+			localStorage.setItem("todos", JSON.stringify(todoList));
 			return {
 				...state,
-				todoList: newTodoList
+				todoList
 			};
 
 		case APPLY_FILTER:
